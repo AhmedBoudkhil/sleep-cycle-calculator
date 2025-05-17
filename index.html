@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    body{
+        font-family: 'Courier New', Courier, monospace, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    .container{
+        background-color: white;
+        padding: 2rem;
+        border-radius: 4px;
+        max-width: 500px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+        width: 90%;
+    }
+    h1{
+        color: #333;
+        text-align: center;
+        margin-bottom: 1.5rem;
+    }
+    .input-field{
+        margin-bottom: 1.5rem;
+    }
+    label{
+        display: block;
+        color: #666;
+        margin-bottom: 1.4em;
+    }
+    select, input[type="time"]{
+        width: 100%;
+        padding: 0.8%;
+        border-radius: 5px;
+        font-size: 1.1rem;
+
+    }
+    button{
+        width: 100%;
+        padding: 1.2em;
+        background-color: #667eea;
+        border: 0;
+        border-radius: 8px;
+        text-align: center;
+        cursor: pointer;
+        font-size: 1.1em;
+        color: #fff;
+        transition: background-color  #667eea;
+        
+    }
+    button:hover{
+        background-color: #3c5be4;
+    }
+    .result-item{
+        margin-top: 1.5rem;
+
+    }
+    .result-item {
+            background: #f8f9fa;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cycle-count {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .time {
+            color: #4a90e2;
+            font-weight: bold;
+        }
+
+</style>
+<body>
+    <div class="container">
+        <h1>Sleep Cycle Calculator 😴 </h1>
+        <div class="input-field">
+            <label for="mode" >Calculate:</label><br>
+            <select id="mode">
+                <option value="wakeup">I want to wake up at...</option>
+                <option value="bedtime">I want to go to bed at...</option>
+            </select>
+        </div>
+        <div class="input-field">
+            <label for="time">Select time</label>
+            <input type="time" id="time" required>
+
+        </div>
+        <button onclick="calculateSleepCycle()">Calculate</button>
+        <div class="results" id="results"></div>
+    </div>
+    <script>
+        // Set default time to current time
+        window.onload = function(){
+            const now = new Date();
+            const hours = now.getHours().toString().padStart(2,"0");
+            const minutes = now.getMinutes().toString().padStart(2,"0");
+
+            document.getElementById("time").value = `${hours}:${minutes}`;
+
+        }
+        function calculateSleepCycle(){
+            const mode = document.getElementById("mode").value;
+            const timeInput = document.getElementById("time").value;
+            const [hours,minutes] = timeInput.split(":").map(Number);
+
+            const baseDate = new Date();
+            baseDate.setHours(hours,minutes,0,0);
+
+            const cycles = [4,5,6];
+
+            const results = [];
+
+            cycles.forEach(cycle => {
+                const resultDate = new Date(baseDate);
+                const minutesToAdd = cycle * 90;
+
+                if(mode === "bedtime"){
+                    resultDate.setMinutes(resultDate.getMinutes() + minutesToAdd);
+                }else{
+                    resultDate.setMinutes(resultDate.getMinutes() - minutesToAdd);
+                }
+                results.push({
+                    cycles: cycle,
+                    time: resultDate.toLocaleTimeString('en-US', { 
+                        hour: 'numeric', 
+                        minute: '2-digit', 
+                        hour12: true 
+                    })
+
+
+                })
+
+            })
+            displayResults(results);
+        }
+        function displayResults(results){
+            const resultContainer = document.getElementById("results");
+            const resultHTML = results.map(result => 
+                `
+                 <div class="result-item">
+                    <span class="cycle-count">${result.cycles} cycles (${result.cycles * 1.5} hours)</span>
+                    <span>${result.time}</span>
+                </div>
+                `
+            ).join('');
+
+            resultContainer.innerHTML = resultHTML;
+        }
+    </script>
+</body>
+</html>
